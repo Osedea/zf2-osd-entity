@@ -5,6 +5,7 @@ namespace OsdEntity;
 class BasicEntity
 {
     const RELATION_ONE = 0;
+
     const RELATION_MANY = 1;
 
     /**
