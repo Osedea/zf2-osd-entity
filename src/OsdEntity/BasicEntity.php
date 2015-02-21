@@ -48,14 +48,19 @@ class BasicEntity
         throw new \InvalidArgumentException($function . ' is not a function of ' . get_class($this));
     }
 
-        /**
+    /**
+     *
+     * Accepts an array of key/values to fill the entity with.
+     * Takes an optional exclude array, which prevents attributes
+     * from being skipped
+     *
      * @param $attributes
      * @param array $exclude
      * @return $this
      */
     public function fill($attributes, array $exclude = array())
     {
-        $attributes = (array) $attributes;
+        $attributes = (array)$attributes;
 
         foreach ($attributes as $key => $value) {
             if ($value != null && property_exists($this, $key) && !in_array($key, $exclude)) {
@@ -67,6 +72,10 @@ class BasicEntity
     }
 
     /**
+     *
+     * Creates an entity and fills it with the array of
+     * key values passed.
+     *
      * @param $attributes
      * @param array $exclude
      * @return mixed
@@ -79,9 +88,12 @@ class BasicEntity
     }
 
     /**
+     * Updates an entity with the array of
+     * key values passed.
+     *
      * @param $attributes
      * @param array $exclude
-     * @return FillableEntityTrait
+     * @return $this
      */
     public function update($attributes, array $exclude = array())
     {
@@ -93,6 +105,10 @@ class BasicEntity
      * that defines all associated relations that should be
      * converted to arrays as well.
      *
+     * Example:
+     *
+     * $user->toArray(['friends', 'comments.tags', 'comments.responses'])
+     *
      * @param array $with
      * @return array
      */
@@ -102,7 +118,7 @@ class BasicEntity
         $excluded = isset($this->exclude) ? $this->exclude : [];
 
         foreach ($this->attributes as $attr) {
-            if ( ! in_array($attr, $excluded)) {
+            if (!in_array($attr, $excluded)) {
                 $getter = $this->translateToGetter($attr);
                 $result[$attr] = $this->$getter();
             }
@@ -121,9 +137,8 @@ class BasicEntity
      * Combines all nested relationships for a given key.
      * Example:
      *
-     * array('user.friend', 'user.family')
-     *
-     * returns array('user' => array('friend', 'family'))
+     * buildNestedArray(array('user.friend', 'user.family'))
+     * >> array('user' => array('friend', 'family'))
      *
      * @param $relations
      * @return array
@@ -132,11 +147,11 @@ class BasicEntity
     {
         $response = array();
 
-        foreach($relations as $relation) {
+        foreach ($relations as $relation) {
             $nestedRelations = explode('.', $relation);
             $attr = array_shift($nestedRelations);
 
-            if ( ! isset($response[$attr])) {
+            if (!isset($response[$attr])) {
                 $response[$attr] = array_values($nestedRelations);
             } else {
                 $response[$attr] = array_merge($response[$attr], array_values($nestedRelations));
@@ -153,11 +168,11 @@ class BasicEntity
      */
     protected function addRelationArray(&$result, $attr, $nestedRelations)
     {
-        if ( ! isset($this->relations[$attr])) {
+        if (!isset($this->relations[$attr])) {
             throw new \InvalidArgumentException($attr . ' is not set as a relation on ' . get_class($this));
         };
 
-        if ($this->relations[$attr] === self::RELATION_MANY){
+        if ($this->relations[$attr] === self::RELATION_MANY) {
             $result[$attr] = $this->getHasManyRelation($attr, $nestedRelations);
         }
 
@@ -165,7 +180,6 @@ class BasicEntity
             $result[$attr] = $this->getHasOneRelation($attr, $nestedRelations);
 
             $idAttr = $attr . '_id';
-
             $result[$idAttr] = isset($result[$attr]['id']) ? $result[$attr]['id'] : null;
         }
     }
@@ -202,7 +216,7 @@ class BasicEntity
      * @param $function
      * @return null|string
      */
-    function translateFunctionToAttribute($function)
+    protected function translateFunctionToAttribute($function)
     {
         $attribute = null;
 
@@ -212,7 +226,7 @@ class BasicEntity
             $attribute = lcfirst(substr($function, 3));
         }
 
-        if ( ! property_exists($this, $attribute)) {
+        if (!property_exists($this, $attribute)) {
             throw new \InvalidArgumentException($attribute . ' is not an attribute of ' . get_class($this));
         }
 
@@ -225,7 +239,7 @@ class BasicEntity
      * @param $attribute
      * @return string
      */
-    function translateToGetter($value)
+    protected function translateToGetter($value)
     {
         $value = $this->snakeToCamel($value);
 
@@ -238,7 +252,7 @@ class BasicEntity
      * @param $attribute
      * @return string
      */
-    function translateToSetter($value)
+    protected function translateToSetter($value)
     {
         $value = $this->snakeToCamel($value);
 
@@ -251,7 +265,8 @@ class BasicEntity
      * @param string
      * @return string
      */
-    function snakeToCamel($val) {
+    protected function snakeToCamel($val)
+    {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $val)));
     }
 }
