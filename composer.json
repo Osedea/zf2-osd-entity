@@ -1,0 +1,8 @@
+{
+    "name": "damacisaac/zf2-osd-entity",
+    "autoload": {
+        "psr-0" : {
+            "OsdEntity" : "src"
+        }
+    }
+}
