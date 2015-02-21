@@ -115,7 +115,7 @@ class BasicEntity
     public function toArray(array $with = array())
     {
         $result = array();
-        $excluded = isset($this->exclude) ? $this->exclude : [];
+        $excluded = isset($this->exclude) ? $this->exclude : array();
 
         foreach ($this->attributes as $attr) {
             if (!in_array($attr, $excluded)) {
@@ -191,7 +191,7 @@ class BasicEntity
      */
     protected function getHasManyRelation($relation, $nestedRelations)
     {
-        $hasManyRelations = $this->$relation ? $this->$relation->toArray() : [];
+        $hasManyRelations = $this->$relation ? $this->$relation->toArray() : array();
 
         return array_map(function ($item) use ($nestedRelations) {
             return $item->toArray($nestedRelations);
@@ -205,7 +205,7 @@ class BasicEntity
      */
     protected function getHasOneRelation($relation, $nestedRelations)
     {
-        return $this->$relation ? $this->$relation->toArray($nestedRelations) : [];
+        return $this->$relation ? $this->$relation->toArray($nestedRelations) : array();
     }
 
     /**
