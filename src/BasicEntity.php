@@ -4,8 +4,6 @@ namespace OsdEntity;
 
 class BasicEntity
 {
-    use FillableEntityTrait;
-
     const RELATION_ONE = 0;
     const RELATION_MANY = 1;
 
@@ -50,6 +48,46 @@ class BasicEntity
         throw new \InvalidArgumentException($function . ' is not a function of ' . get_class($this));
     }
 
+        /**
+     * @param $attributes
+     * @param array $exclude
+     * @return $this
+     */
+    public function fill($attributes, array $exclude = array())
+    {
+        $attributes = (array) $attributes;
+
+        foreach ($attributes as $key => $value) {
+            if ($value != null && property_exists($this, $key) && !in_array($key, $exclude)) {
+                $this->$key = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $attributes
+     * @param array $exclude
+     * @return mixed
+     */
+    public static function create($attributes, array $exclude = array())
+    {
+        $entity = new static;
+
+        return $entity->fill($attributes, $exclude);
+    }
+
+    /**
+     * @param $attributes
+     * @param array $exclude
+     * @return FillableEntityTrait
+     */
+    public function update($attributes, array $exclude = array())
+    {
+        return $this->fill($attributes, $exclude);
+    }
+
     /**
      * Converts an entity to an array. Accepts a $with parameter,
      * that defines all associated relations that should be
@@ -58,9 +96,9 @@ class BasicEntity
      * @param array $with
      * @return array
      */
-    public function toArray(array $with = [])
+    public function toArray(array $with = array())
     {
-        $result = [];
+        $result = array();
         $excluded = isset($this->exclude) ? $this->exclude : [];
 
         foreach ($this->attributes as $attr) {
@@ -92,7 +130,7 @@ class BasicEntity
      */
     protected function buildNestedRelationsArray($relations)
     {
-        $response = [];
+        $response = array();
 
         foreach($relations as $relation) {
             $nestedRelations = explode('.', $relation);
