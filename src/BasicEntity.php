@@ -1,6 +1,6 @@
 <?php
 
-namespace Application\Entity;
+namespace OsdEntity;
 
 class BasicEntity
 {

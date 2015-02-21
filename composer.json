@@ -1,4 +1,10 @@
 {
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/damacisaac/zf2-osd-entity.git"
+        }
+    ],
     "name": "damacisaac/zf2-osd-entity",
     "autoload": {
         "psr-0" : {
