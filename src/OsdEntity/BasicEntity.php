@@ -64,13 +64,10 @@ class BasicEntity
         $attributes = (array)$attributes;
 
         foreach ($attributes as $key => $value) {
-            if (!$value || !property_exists($this, $key) || in_array($key, $exclude)) {
-                return $this;
+            if ($value != null && property_exists($this, $key) && !in_array($key, $exclude)) {
+                $setter = $this->translateToSetter($key);
+                $this->$setter($value);
             }
-
-            $setter = $this->translateToSetter($key);
-
-            $this->$setter($value);
         }
 
         return $this;
