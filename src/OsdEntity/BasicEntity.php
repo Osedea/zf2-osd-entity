@@ -64,9 +64,13 @@ class BasicEntity
         $attributes = (array)$attributes;
 
         foreach ($attributes as $key => $value) {
-            if ($value != null && property_exists($this, $key) && !in_array($key, $exclude)) {
-                $this->$key = $value;
+            if (!$value || !property_exists($this, $key) || in_array($key, $exclude)) {
+                return $this;
             }
+
+            $setter = $this->translateToSetter($key);
+
+            $this->$setter($value);
         }
 
         return $this;
@@ -227,11 +231,19 @@ class BasicEntity
             $attribute = lcfirst(substr($function, 3));
         }
 
-        if (!property_exists($this, $attribute)) {
-            throw new \InvalidArgumentException($attribute . ' is not an attribute of ' . get_class($this));
+        // First try with camelCase value
+        if (property_exists($this, $attribute)) {
+            return $attribute;
         }
 
-        return $attribute;
+        $attribute = $this->camelToSnake($attribute);
+
+        // Then try with snake_case value
+        if (property_exists($this, $attribute)) {
+            return $attribute;
+        }
+
+        throw new \InvalidArgumentException($attribute . ' is not an attribute of ' . get_class($this));
     }
 
     /**
@@ -269,5 +281,16 @@ class BasicEntity
     protected function snakeToCamel($val)
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $val)));
+    }
+
+    /**
+     * Take a StringLikeThis and return a string_like_this
+     *
+     * @param $val
+     * @return string
+     */
+    protected function camelToSnake($val)
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $val));
     }
 }
