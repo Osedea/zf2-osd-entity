@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit  colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         verbose="true"
+         syntaxCheck="true"
+    >
+    <testsuite name="OsdEntity Test Suite">
+        <directory>.</directory>
+    </testsuite>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">.</directory>
+        </whitelist>
+    </filter>
+</phpunit>
